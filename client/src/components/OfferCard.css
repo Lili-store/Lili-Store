@@ -1,0 +1,25 @@
+.product-card {
+  background-color: #fffefc;
+  border: 1px solid #eee;
+  padding: 20px;
+  border-radius: 10px;
+  width: 280px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.product-image {
+  width: 100%;
+  height: auto;
+  margin-bottom: 10px;
+}
+
+.add-btn {
+  background-color: #4b2e2e;
+  color: white;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 5px;
+  margin-top: 10px;
+  cursor: pointer;
+}

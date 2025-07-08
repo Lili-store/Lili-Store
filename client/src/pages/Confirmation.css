@@ -1,0 +1,36 @@
+/* src/pages/Confirmation.css */
+.confirmation-container {
+  max-width: 600px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #4b2e2e;
+}
+
+.confirmation-container h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.confirmation-container p {
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+}
+
+.back-home {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 20px;
+  background-color: #4b2e2e;
+  color: white;
+  text-decoration: none;
+  border-radius: 6px;
+}
+
+.back-home:hover {
+  background-color: #6b4530;
+}

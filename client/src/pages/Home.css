@@ -1,0 +1,24 @@
+.home {
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  padding: 30px;
+  background-color: #f7f1ec;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  width: 280px;
+  text-align: center;
+  box-shadow: 0 0 12px rgba(0,0,0,0.1);
+  text-decoration: none;
+  color: #333;
+}
+
+.card img {
+  width: 100%;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
