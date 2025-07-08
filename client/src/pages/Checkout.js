@@ -1,125 +1,109 @@
-import React, { useContext, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useContext } from 'react';
 import { CartContext } from '../CartContext';
 import './Checkout.css';
 
-function Checkout({ products }) {
-  const { cartItems } = useContext(CartContext);
-  const navigate = useNavigate();
+function Checkout() {
+  const { cartItems, clearCart } = useContext(CartContext);
+  const [formData, setFormData] = useState({
+    name: '',
+    phone: '',
+    address: '',
+    paymentMethod: 'الدفع عند الاستلام',
+  });
 
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [address, setAddress] = useState('');
-  const [paymentMethod, setPaymentMethod] = useState('الدفع عند الاستلام');
-  const [size, setSize] = useState('M');
+  const [success, setSuccess] = useState(false);
 
-  const totalAmount = cartItems.reduce(
-    (total, item) => total + (item.price * item.quantity),
-    0
-  );
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const orderDetails = {
-      name,
-      phone,
-      address,
-      size,
-      paymentMethod,
-      items: cartItems.map(item => `${item.name} (x${item.quantity})`).join(', '),
-      total: totalAmount
-    };
+    const formDataToSend = new FormData();
+    formDataToSend.append('الاسم', formData.name);
+    formDataToSend.append('رقم الهاتف', formData.phone);
+    formDataToSend.append('العنوان', formData.address);
+    formDataToSend.append('طريقة الدفع', formData.paymentMethod);
+
+    const total = cartItems.reduce(function(acc, item) {
+      return acc + item.price * item.quantity;
+    }, 0);
+
+    formDataToSend.append('الإجمالي', total + ' جنيه');
+
+    formDataToSend.append('تفاصيل الطلب', cartItems.map(function(item){
+      return item.name + ' - مقاس ' + (item.size || 'غير محدد') + ' × ' + item.quantity;
+    }).join(', '));
 
     try {
-      await fetch('https://formspree.io/f/xzzglawy', {
+      const response = await fetch('https://formspree.io/f/xzzglawy', {
         method: 'POST',
+        body: formDataToSend,
         headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderDetails),
+          Accept: 'application/json'
+        }
       });
 
-      navigate('/confirmation');
+      if (response.ok) {
+        setSuccess(true);
+        clearCart();
+      } else {
+        alert('حدث خطأ أثناء إرسال الطلب.');
+      }
     } catch (error) {
-      console.error('Error:', error);
+      alert('تعذر الاتصال بالخادم.');
     }
   };
 
   return (
     <div className="checkout-container">
-      <h2>إتمام الطلب</h2>
-
-      {cartItems.length === 0 ? (
-        <p>السلة فارغة</p>
+      {success ? (
+        <div>
+          <h2>✅ تم إرسال الطلب بنجاح!</h2>
+          <p>شكرًا لتسوقك من Lili Store ❤️</p>
+        </div>
       ) : (
-        <form className="checkout-form" onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="الاسم"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
+        <>
+          <h2>اتمام الطلب</h2>
+          <form className="checkout-form" onSubmit={handleSubmit}>
+            <input
+              type="text"
+              name="name"
+              placeholder="الاسم"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
+            <input
+              type="tel"
+              name="phone"
+              placeholder="رقم الهاتف"
+              value={formData.phone}
+              onChange={handleChange}
+              required
+            />
+            <textarea
+              name="address"
+              placeholder="العنوان بالتفصيل"
+              value={formData.address}
+              onChange={handleChange}
+              required
+            ></textarea>
 
-          <input
-            type="tel"
-            placeholder="رقم الهاتف"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            required
-          />
+            <label htmlFor="paymentMethod">طريقة الدفع:</label>
+            <select
+              name="paymentMethod"
+              value={formData.paymentMethod}
+              onChange={handleChange}
+            >
+              <option value="الدفع عند الاستلام">الدفع عند الاستلام</option>
+              <option value="فودافون كاش">فودافون كاش</option>
+            </select>
 
-          <input
-            type="text"
-            placeholder="العنوان"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            required
-          />
-
-          <select value={size} onChange={(e) => setSize(e.target.value)}>
-            <option value="M">M</option>
-            <option value="L">L</option>
-          </select>
-
-          <div className="payment-methods">
-            <label>
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="الدفع عند الاستلام"
-                checked={paymentMethod === 'الدفع عند الاستلام'}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-              />
-              الدفع عند الاستلام
-            </label>
-
-            <label>
-              <input
-                type="radio"
-                name="paymentMethod"
-                value="فودافون كاش"
-                checked={paymentMethod === 'فودافون كاش'}
-                onChange={(e) => setPaymentMethod(e.target.value)}
-              />
-              فودافون كاش
-            </label>
-          </div>
-
-          <h3>الملخص:</h3>
-          <ul>
-            {cartItems.map((item) => (
-              <li key={item.id}>
-                {item.name} × {item.quantity} = {item.price * item.quantity} جنيه
-              </li>
-            ))}
-          </ul>
-
-          <h3>الإجمالي: {totalAmount} جنيه</h3>
-
-          <button type="submit">إتمام الطلب</button>
-        </form>
+            <button type="submit">اتمام الطلب</button>
+          </form>
+        </>
       )}
     </div>
   );
